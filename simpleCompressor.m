@@ -1,5 +1,5 @@
 function y = simpleCompressor(x,T,R,M,detectionMode)
-%NEWSIMPLECOMPRESSOR A function to provide simple compression of a signal
+%SIMPLECOMPRESSOR A function to provide simple compression of a signal
 %   x - an N-point vector corresponding to a mono signal
 %   T - the threshold in dB, <= 0, default -10dB
 %   R - the compression ratio, >= 1, default 5
@@ -48,7 +48,7 @@ elseif strcmp(detectionMode, 'RMS')
     end
     if stereo
         for windowStart = length(x_squared)+1:numel(x_squared)
-            x_db(windowStart) = sum(x_squared(windowStart:min((windowStart+windowLength), numel(x_squared)));
+            x_db(windowStart) = sum(x_squared(windowStart:min((windowStart+windowLength), numel(x_squared))));
         end
     end
     x_db = sqrt(x_db/windowLength);
@@ -61,12 +61,13 @@ x_c = x_db;
 gain_reduction = zeros(size(x_db));
 for element = 1:length(x_db)
     if x_db(element) >= T
-         gain_reduction(element) = x_db(element) - (T + ((x_db(element) - T)/R));  
+         gain_reduction(element) = x_db(element) - (T + ((x_db(element) - T)/R));
     end
 end
 if stereo
     for gain = 1:length(gain_reduction)
         x_c(gain) = x_db(gain) - max(gain_reduction(gain), gain_reduction(length(gain_reduction)+gain));
+        x_c(length(gain_reduction)+gain) = x_db(length(gain_reduction)+gain) - max(gain_reduction(gain), gain_reduction(length(gain_reduction)+gain));
     end
 else
     x_c = x_db - gain_reduction;
@@ -85,4 +86,3 @@ g = 10.^(g_db/20);
 y = x .* g;
 
 end
-
